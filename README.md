@@ -8,7 +8,9 @@ git clone https://github.com/Bradleynewlon0214/Recipeze.git
 
 cd Recipeze
 
-npm init
+cd frontend
+
+npm i
 
 npm start
 
