@@ -1,0 +1,63 @@
+
+WHEN YOU SEARCH FOR NEW INGREDIENTS MINIMIZE THE NUMBER OF NEW INGREDIENTS A RECIPE WILL ADD TO YOUR LIST
+
+TODO:
+Export Ingredient List
+    -Text - Check
+    -Email - Check
+Forgot password
+Harden Site
+    -Security on adding recipe
+
+
+Overview of basic functions:
+1. Be able to view list of recipes - Check
+2. Be able to view details about the recipes - Check
+3. Be able to save the recipes - Check
+4. Be able to report recipes (bugs) - Check
+4. Be able to search recipes - Check
+5. Be able to add recipes - Check
+6. Be able to view similar recipes - Check
+7. Be able to generate baskets - ?
+
+Pages:
+RecipeListView - Shows a list of all the recipes in a grid format. Three columns of recipe cards
+    - On this page you can see each recipe's picture, title, and description
+    - You can save the recipe by clicking the star icon
+    - You can report a bug or problem with the recipe by clicking the flag icon
+    - This view is paginated so you see 24 recipes at a time.
+RecipeDetailView - Shows the recipe title, description, ingredients, directions, tags, and similar recipes
+    - This page is laid out as two separate containers. The first holds the recipe information and the second contains recipes sharing the same ingredients
+    - Each tag is clickable which takes you to another page showing all of the other recipes sharing the same tag
+    - As in the ListView, you can save the recipe by clicking the star icon, or report a bug or problem with the recipe by clicking the flag icon
+    - Under related recipes, you can view user comments or leave your own.
+    - Clicking a tag takes you to another page to see all recipes sharing that tag.
+Discover - This page lets you search through recipe titles
+    - This page only features a search bar that says "Search Recipes"
+    - Upon clicking a tag in DetailView, the similarly tagged recipes appear in the discover view
+    - In 4 columns each tag is listed under the search box. Clicking one will take you to another page showing every recipe that shares that tag
+SavedRecipes - Shows a list of all of your saved recipes
+    - Saved recipes show up in a table and are selectable
+    - Upon selection two buttons activate, delete and show ingredients
+    - Clicking show ingredients, shows a list of each selected recipe's ingredients in a new list under the ingredients table
+    - I would like clicking show ingredients to really be more like a "show grocery list" button where identical ingredients would be combined and it would show the total of each ingredient you need
+AddRecipe - Lets you add a new recipe in the same format as the DetailView
+    - I've laid this page to look as similar as possible to the DetailView's layout
+    - You can add ingredients dynamically and each ingredient in broken up into three inputs. Quantity, Measurement, Ingredient Name
+    - Steps can be added dynamically as well and each step is added as one input. 
+    - You can select as many tags as you want by typing in a dropdown box
+    - Nutrition information can also be submitted for each recipe. I have a form for Calories, # Servings, Fat, Carbohydrates, Protein, Sodium, Fiber, Cholesterol, Saturated Fat, MonoFat, and PolyFat
+
+
+Recipe Model Spec:
+    - ID - Number
+    - NAME - String
+    - DESCRIPTION - String
+    - IMAGE - String/Link/File Location
+    - STEPS - String Array
+    - INGREDIENTS_LIST - String Array
+    - INGREDIENTS_JSON - JSON Array
+    - TAGS - String Array
+    - YIELD - String
+    - PER_SERVING - String
+    - NUTRITION - JSON String

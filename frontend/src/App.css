@@ -1,0 +1,26 @@
+#components-layout-demo-custom-trigger .trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+#components-layout-demo-custom-trigger .trigger:hover {
+  color: #1890ff;
+}
+
+#components-layout-demo-custom-trigger .logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}
+
+.site-layout .site-layout-background {
+  /* background: rgb(245, 245, 245);*/
+  background: rgb(226,243,255);
+  background: -moz-linear-gradient(0deg, rgba(226,243,255,1) 0%, rgba(0,194,255,1) 100%);
+  background: -webkit-linear-gradient(0deg, rgba(226,243,255,1) 0%, rgba(0,194,255,1) 100%);
+  background: linear-gradient(0deg, rgba(226,243,255,1) 0%, rgba(0,194,255,1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#e2f3ff",endColorstr="#00c2ff",GradientType=1); 
+}
