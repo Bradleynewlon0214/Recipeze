@@ -5,8 +5,12 @@ This is the React frontend from my project Recipeze.net. It uses styled componen
 To get this up and running on your machine (Windows) from your command line run:
 
 git clone https://github.com/Bradleynewlon0214/Recipeze.git
+
 cd Recipeze
+
 npm init
+
 npm start
+
 
 Although, I haven't pushed the backend, the app will pull from a server I already have in production.
