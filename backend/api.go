@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	_ "github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type APIServer struct {
@@ -28,6 +28,7 @@ func NewAPIServer(listenAddr string, store Storage) *APIServer {
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
 
+	router.HandleFunc("/login", makeHTTPHandleFunc(s.handleLogin))
 	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccount))
 	router.HandleFunc("/account/{id}", withJWTAuth(makeHTTPHandleFunc(s.handleGetAccountByID), s.store))
 	router.HandleFunc("/transfer", makeHTTPHandleFunc(s.handleTransfer))
@@ -35,6 +36,39 @@ func (s *APIServer) Run() {
 	log.Println("Starting Server on port: ", s.listenAddr)
 
 	http.ListenAndServe(s.listenAddr, router)
+}
+
+func CheckPassword(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != "POST" {
+		return fmt.Errorf("method not allowed")
+	}
+
+	var req LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return err
+	}
+
+	acc, err := s.store.GetAccountByNumber(int64(req.Number))
+	if err != nil {
+		return err
+	}
+
+	valid := CheckPassword(req.Password, acc.EncryptedPassword)
+	if !valid {
+		return WriteJson(w, http.StatusForbidden, APIError{Error: "invalid credentials"})
+	}
+
+	tokenString, err := createJWT(acc)
+	if err != nil {
+		return err
+	}
+
+	return WriteJson(w, http.StatusOK, LoginResponse{Token: tokenString})
 }
 
 func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error {
@@ -81,17 +115,13 @@ func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
-	account := NewAccount(accReq.FirstName, accReq.LastName)
-	if err := s.store.CreateAccount(account); err != nil {
-		return err
-	}
-
-	tokenString, err := createJWT(account)
+	account, err := NewAccount(accReq.FirstName, accReq.LastName, accReq.Password)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("jwt token: ", tokenString)
+	if err := s.store.CreateAccount(account); err != nil {
+		return err
+	}
 
 	return WriteJson(w, http.StatusOK, account)
 }
@@ -126,11 +156,8 @@ func WriteJson(w http.ResponseWriter, status int, v any) error {
 	return json.NewEncoder(w).Encode(v)
 }
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50TnVtYmVyIjoyNzEzNTMyLCJleHBpcmVzQXQiOjE1MTYyMzkwMjJ9.VxyDSyx4GmKBXP2QkyGPuv6tWSWjYwUAEX4oa0yoRXo
-
 func permissionDenied(w http.ResponseWriter) {
 	WriteJson(w, http.StatusForbidden, APIError{Error: "permission denied"})
-	return
 }
 
 func withJWTAuth(handlerFunc http.HandlerFunc, s Storage) http.HandlerFunc {
@@ -162,7 +189,6 @@ func withJWTAuth(handlerFunc http.HandlerFunc, s Storage) http.HandlerFunc {
 		}
 
 		claims := token.Claims.(jwt.MapClaims)
-		fmt.Println(claims)
 
 		if account.Number != int64(claims["accountNumber"].(float64)) {
 			permissionDenied(w)
@@ -185,12 +211,10 @@ func createJWT(account *Account) (string, error) {
 
 func validateJWT(tokenString string) (*jwt.Token, error) {
 	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 		return []byte("superSecret"), nil
 	})
 }
