@@ -50,3 +50,18 @@ func NewAccount(firstName, lastName string, password string) (*Account, error) {
 		CreatedAt:         time.Now().UTC(),
 	}, nil
 }
+
+type Recipe struct {
+	ID          int          `json:"id"`
+	Chef        int          `json:"chef"`
+	Name        string       `json:"name"`
+	RecipeImage string       `json:"recipeImage"`
+	Steps       string       `json:"steps"`
+	Description string       `json:"description"`
+	Ingredients []Ingredient `json:"ingredients"`
+}
+
+type Ingredient struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
